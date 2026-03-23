@@ -23,7 +23,8 @@
       const newSession: Session = {
         id: newId,
         name: newSessionName,
-        description: newSessionDesc || null
+        description: newSessionDesc || null,
+        created_at: new Date().toISOString()
       };
 
       appSettings.activeSession = newSession;
@@ -59,6 +60,15 @@
   </form>
 
 
+
+  <hr style="margin: 40px auto; width: 60%; border-color: #ddd;" />
+
+  <h2>Review Past Sessions</h2>
+  <div class="row" style="margin-top: 20px;">
+    <button type="button" onclick={() => goto('/past-sessions')} style="padding: 0.8em 1.5em; font-size: 1.1em; background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;">
+      View Past Sessions
+    </button>
+  </div>
 </main>
 
 <style>

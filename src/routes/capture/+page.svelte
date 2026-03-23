@@ -43,6 +43,13 @@
     }
   }
 
+  function handleKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      capturePhrase();
+    }
+  }
+
   function handleTyping() {
     if (typingTimer) clearTimeout(typingTimer);
     if (phrase && appSettings.activeSession) {
@@ -59,7 +66,8 @@
         sessionId: appSettings.activeSession.id, 
         phrase,
         sourceLang,
-        targetLang
+        targetLang,
+        apiKey: appSettings.geminiToken
       });
       info(`Successfully captured phrase`);
       await loadPhrases();
@@ -111,7 +119,7 @@
     </div>
 
     <div class="row" style="margin-top: 40px;">
-      <input id="phrase-input" placeholder="Start typing a phrase..." bind:value={phrase} oninput={handleTyping} style="width: 400px; padding: 1em; font-size: 1.2em;" />
+      <input id="phrase-input" placeholder="Start typing a phrase..." bind:value={phrase} oninput={handleTyping} onkeydown={handleKeyDown} style="width: 400px; padding: 1em; font-size: 1.2em;" />
     </div>
     
     <div style="margin-top: 40px; text-align: left; max-width: 500px; margin-left: auto; margin-right: auto;">

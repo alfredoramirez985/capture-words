@@ -10,6 +10,7 @@ pub struct Session {
     pub finish_page: Option<i64>,
     pub created_at: String,
     pub updated_at: String,
+    pub is_favorite: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, FromRow, Clone)]
@@ -58,12 +59,21 @@ pub async fn create_session(
 
 pub async fn get_sessions(pool: &SqlitePool) -> Result<Vec<Session>, sqlx::Error> {
     let sessions = sqlx::query_as::<_, Session>(
-        "SELECT id, name, description, init_page, finish_page, created_at, updated_at FROM sessions ORDER BY updated_at DESC"
+        "SELECT id, name, description, init_page, finish_page, created_at, updated_at, is_favorite FROM sessions ORDER BY is_favorite DESC, updated_at DESC"
     )
     .fetch_all(pool)
     .await?;
 
     Ok(sessions)
+}
+
+pub async fn toggle_favorite_session(pool: &SqlitePool, session_id: i64, is_favorite: bool) -> Result<(), sqlx::Error> {
+    sqlx::query("UPDATE sessions SET is_favorite = ? WHERE id = ?")
+        .bind(is_favorite)
+        .bind(session_id)
+        .execute(pool)
+        .await?;
+    Ok(())
 }
 
 pub async fn save_phrase(pool: &SqlitePool, session_id: i64, phrase: &str) -> Result<i64, sqlx::Error> {

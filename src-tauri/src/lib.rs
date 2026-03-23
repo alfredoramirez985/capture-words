@@ -7,6 +7,8 @@ use tauri::Emitter;
 use reqwest::Client;
 use serde_json::json;
 use dotenvy::dotenv;
+use std::fs;
+use uuid::Uuid;
 
 use log::{error, info};
 
@@ -30,7 +32,21 @@ async fn get_sessions(pool: tauri::State<'_, SqlitePool>) -> Result<Vec<reposito
 }
 
 #[tauri::command]
-async fn save_phrase(session_id: i64, phrase: String, source_lang: String, target_lang: String, app: tauri::AppHandle, pool: tauri::State<'_, SqlitePool>) -> Result<i64, String> {
+fn get_user_guid(guid: tauri::State<'_, String>) -> String {
+    guid.inner().clone()
+}
+
+#[tauri::command]
+async fn toggle_favorite(session_id: i64, is_favorite: bool, pool: tauri::State<'_, SqlitePool>) -> Result<(), String> {
+    info!("Toggling favorite for session {} to {}", session_id, is_favorite);
+    repository::toggle_favorite_session(&pool, session_id, is_favorite).await.map_err(|e| {
+        error!("Error toggling favorite: {}", e);
+        e.to_string()
+    })
+}
+
+#[tauri::command]
+async fn save_phrase(session_id: i64, phrase: String, source_lang: String, target_lang: String, api_key: String, app: tauri::AppHandle, pool: tauri::State<'_, SqlitePool>) -> Result<i64, String> {
     info!("Saving phrase for session {}", session_id);
     let phrase_id = repository::save_phrase(&pool, session_id, &phrase).await.map_err(|e| {
         error!("Error saving phrase: {}", e);
@@ -41,8 +57,6 @@ async fn save_phrase(session_id: i64, phrase: String, source_lang: String, targe
     let phrase_clone = phrase.clone();
 
     tauri::async_runtime::spawn(async move {
-        dotenv().ok();
-        let api_key = std::env::var("GEMINI_API_KEY").unwrap_or_default();
         if api_key.is_empty() || api_key == "your_gemini_api_key_here" {
             error!("Gemini API key not found or not set.");
             return;
@@ -51,6 +65,8 @@ async fn save_phrase(session_id: i64, phrase: String, source_lang: String, targe
         let client = Client::new();
 
         let system_prompt = format!("You are a professional translator. Translate the following text from {} to {}. Reply ONLY with the translated text, no quotation marks and no extra conversation.", source_lang, target_lang);
+        
+        println!("====== GEMINI PROMPT ======\nSystem Instruction:\n{}\n\nUser Content:\n{}\n===========================", system_prompt, phrase_clone);
 
         let request_body = json!({
             "system_instruction": {
@@ -120,9 +136,29 @@ pub fn run() {
                 db::init(app_data_dir).await.expect("Failed to initialize database")
             });
             app.manage(pool);
+
+            if let Ok(home) = app.path().home_dir() {
+                let guid_path = home.join(".capture-words-guid");
+                let guid: String;
+                if guid_path.exists() {
+                    guid = fs::read_to_string(&guid_path).unwrap_or_default().trim().to_string();
+                    info!("Loaded user GUID: {}", guid);
+                } else {
+                    guid = Uuid::new_v4().to_string();
+                    if let Err(e) = fs::write(&guid_path, &guid) {
+                        error!("Failed to write GUID to {:?}: {}", guid_path, e);
+                    } else {
+                        info!("Generated new user GUID: {}", guid);
+                    }
+                }
+                app.manage(guid);
+            } else {
+                error!("Could not resolve home directory for GUID storage.");
+            }
+
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![create_session, get_sessions, save_phrase, get_phrases])
+        .invoke_handler(tauri::generate_handler![create_session, get_sessions, save_phrase, get_phrases, toggle_favorite, get_user_guid])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

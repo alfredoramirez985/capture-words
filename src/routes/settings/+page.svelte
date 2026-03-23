@@ -11,6 +11,11 @@
     <input id="delay-input" type="number" min="1" max="120" bind:value={appSettings.captureDelaySeconds} style="padding: 0.5em; border-radius: 8px; width: 60px; text-align: center;" />
   </div>
 
+  <div class="row" style="margin-bottom: 20px; justify-content: center; display: flex;">
+    <label for="gemini-token-input" style="margin-right: 10px; align-self: center;">Gemini API Token:</label>
+    <input id="gemini-token-input" type="password" placeholder="Paste token here" bind:value={appSettings.geminiToken} style="padding: 0.5em; border-radius: 8px; width: 300px; text-align: center;" />
+  </div>
+
   <div class="row" style="margin-top: 20px; justify-content: center; display: flex;">
     <button type="button" onclick={() => goto('/')}>Back to Capture</button>
   </div>
