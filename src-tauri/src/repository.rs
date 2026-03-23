@@ -12,7 +12,23 @@ pub struct Session {
     pub updated_at: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, FromRow)]
+#[derive(Serialize, Deserialize, Debug, FromRow, Clone)]
+pub struct Translation {
+    pub id: i64,
+    pub phrase_id: i64,
+    pub language_code: String,
+    pub translated_text: String,
+    pub created_at: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct PhraseWithTranslations {
+    #[serde(flatten)]
+    pub phrase: Phrase,
+    pub translations: Vec<Translation>,
+}
+
+#[derive(Serialize, Deserialize, Debug, FromRow, Clone)]
 pub struct Phrase {
     pub id: i64,
     pub session_id: i64,
@@ -62,7 +78,7 @@ pub async fn save_phrase(pool: &SqlitePool, session_id: i64, phrase: &str) -> Re
     Ok(result.last_insert_rowid())
 }
 
-pub async fn get_phrases(pool: &SqlitePool, session_id: i64) -> Result<Vec<Phrase>, sqlx::Error> {
+pub async fn get_phrases_with_translations(pool: &SqlitePool, session_id: i64) -> Result<Vec<PhraseWithTranslations>, sqlx::Error> {
     let phrases = sqlx::query_as::<_, Phrase>(
         "SELECT id, session_id, phrase, created_at FROM phrases WHERE session_id = ? ORDER BY created_at DESC"
     )
@@ -70,5 +86,33 @@ pub async fn get_phrases(pool: &SqlitePool, session_id: i64) -> Result<Vec<Phras
     .fetch_all(pool)
     .await?;
 
-    Ok(phrases)
+    let mut result = Vec::new();
+    for phrase in phrases {
+        let translations = sqlx::query_as::<_, Translation>(
+            "SELECT id, phrase_id, language_code, translated_text, created_at FROM translations WHERE phrase_id = ?"
+        )
+        .bind(phrase.id)
+        .fetch_all(pool)
+        .await?;
+
+        result.push(PhraseWithTranslations {
+            phrase,
+            translations,
+        });
+    }
+
+    Ok(result)
+}
+
+pub async fn save_translation(pool: &SqlitePool, phrase_id: i64, language_code: &str, translated_text: &str) -> Result<i64, sqlx::Error> {
+    let result = sqlx::query(
+        "INSERT INTO translations (phrase_id, language_code, translated_text) VALUES (?, ?, ?)"
+    )
+    .bind(phrase_id)
+    .bind(language_code)
+    .bind(translated_text)
+    .execute(pool)
+    .await?;
+
+    Ok(result.last_insert_rowid())
 }

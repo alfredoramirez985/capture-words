@@ -4,6 +4,7 @@
   import { appSettings, type Session } from "$lib/settings.svelte";
   import { goto } from "$app/navigation";
   import { fly, fade } from "svelte/transition";
+  import { error as logError, info } from "@tauri-apps/plugin-log";
 
   let newSessionName = $state("");
   let newSessionDesc = $state("");
@@ -29,9 +30,11 @@
       newSessionName = "";
       newSessionDesc = "";
       
+      info(`Successfully created session ${newId}: ${newSession.name}`);
       goto('/capture');
-    } catch (error) {
-      console.error("Failed to create session:", error);
+    } catch (err) {
+      logError(`Failed to create session: ${err}`);
+      console.error("Failed to create session:", err);
     }
   }
 
