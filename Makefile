@@ -1,4 +1,4 @@
-.PHONY: build run debug build-debug dev
+.PHONY: build run debug build-debug dev clean
 
 # Default target
 all: build
@@ -24,3 +24,7 @@ build-debug:
 
 # Alias if "mode debug" meant dev or build-debug
 debug: build-debug
+
+# Clean build artifacts and dependencies
+clean:
+	rm -rf node_modules .svelte-kit src-tauri/target

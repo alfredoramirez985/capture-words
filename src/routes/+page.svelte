@@ -1,156 +1,109 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
+  import { onMount } from "svelte";
+  import { appSettings, type Session } from "$lib/settings.svelte";
+  import { goto } from "$app/navigation";
+  import { fly, fade } from "svelte/transition";
+  import { error as logError, info } from "@tauri-apps/plugin-log";
 
-  let name = $state("");
-  let greetMsg = $state("");
+  let newSessionName = $state("");
+  let newSessionDesc = $state("");
 
-  async function greet(event: Event) {
+  async function createNewSession(event: Event) {
     event.preventDefault();
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    greetMsg = await invoke("greet", { name });
+    if (!newSessionName) return;
+    try {
+      const newId: number = await invoke("create_session", { 
+        name: newSessionName, 
+        description: newSessionDesc || null,
+        init_page: null,
+        finish_page: null
+      });
+      
+      const newSession: Session = {
+        id: newId,
+        name: newSessionName,
+        description: newSessionDesc || null,
+        created_at: new Date().toISOString()
+      };
+
+      appSettings.activeSession = newSession;
+      newSessionName = "";
+      newSessionDesc = "";
+      
+      info(`Successfully created session ${newId}: ${newSession.name}`);
+      goto('/capture');
+    } catch (err) {
+      logError(`Failed to create session: ${err}`);
+      console.error("Failed to create session:", err);
+    }
   }
+
+
 </script>
 
-<main class="container">
-  <h1>Welcome to Tauri + Svelte</h1>
-
-  <div class="row">
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo vite" alt="Vite Logo" />
-    </a>
-    <a href="https://tauri.app" target="_blank">
-      <img src="/tauri.svg" class="logo tauri" alt="Tauri Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank">
-      <img src="/svelte.svg" class="logo svelte-kit" alt="SvelteKit Logo" />
-    </a>
+<main class="container" in:fly={{ y: -50, duration: 400 }} out:fade={{ duration: 200 }}>
+  <div style="position: absolute; top: 20px; right: 20px;">
+    <button type="button" onclick={() => goto('/settings')}>Settings</button>
   </div>
-  <p>Click on the Tauri, Vite, and SvelteKit logos to learn more.</p>
+  
+  <h1>Capture Words</h1>
+  <p>Create a session to start capturing phrases.</p>
+  
+  <hr style="margin: 30px auto; width: 50%; border-color: #ddd;" />
 
-  <form class="row" onsubmit={greet}>
-    <input id="greet-input" placeholder="Enter a name..." bind:value={name} />
-    <button type="submit">Greet</button>
+  <h2>Create New Session</h2>
+  <form class="row" onsubmit={createNewSession} style="margin-bottom: 40px; margin-top: 20px;">
+    <input placeholder="Session Name..." bind:value={newSessionName} required />
+    <input placeholder="Description (Optional)..." bind:value={newSessionDesc} style="margin-left: 5px;" />
+    <button type="submit" style="margin-left: 10px; background-color: #24c8db; color: #111;">Create & Enter</button>
   </form>
-  <p>{greetMsg}</p>
+
+
+
+  <hr style="margin: 40px auto; width: 60%; border-color: #ddd;" />
+
+  <h2>Review Past Sessions</h2>
+  <div class="row" style="margin-top: 20px;">
+    <button type="button" onclick={() => goto('/past-sessions')} style="padding: 0.8em 1.5em; font-size: 1.1em; background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;">
+      View Past Sessions
+    </button>
+  </div>
 </main>
 
 <style>
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
-}
-
-.logo.svelte-kit:hover {
-  filter: drop-shadow(0 0 2em #ff3e00);
-}
-
 :root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 400;
-
+  font-family: Inter, Avenir, sans-serif;
   color: #0f0f0f;
   background-color: #f6f6f6;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
 }
-
 .container {
   margin: 0;
-  padding-top: 10vh;
+  padding-top: 15vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   text-align: center;
 }
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: 0.75s;
-}
-
-.logo.tauri:hover {
-  filter: drop-shadow(0 0 2em #24c8db);
-}
-
 .row {
   display: flex;
   justify-content: center;
+  align-items: center;
 }
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
-}
-
-h1 {
-  text-align: center;
-}
-
-input,
-button {
+input, button, select {
   border-radius: 8px;
-  border: 1px solid transparent;
+  border: 1px solid #ccc;
   padding: 0.6em 1.2em;
   font-size: 1em;
-  font-weight: 500;
   font-family: inherit;
-  color: #0f0f0f;
-  background-color: #ffffff;
-  transition: border-color 0.25s;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-}
-
-button {
-  cursor: pointer;
-}
-
-button:hover {
-  border-color: #396cd8;
-}
-button:active {
-  border-color: #396cd8;
-  background-color: #e8e8e8;
-}
-
-input,
-button {
+  transition: all 0.25s;
   outline: none;
 }
-
-#greet-input {
-  margin-right: 5px;
-}
-
+button { cursor: pointer; box-shadow: 0 2px 2px rgba(0,0,0,0.1); background-color: #fff; }
+button:hover { border-color: #396cd8; }
+button:active { background-color: #eee; }
 @media (prefers-color-scheme: dark) {
-  :root {
-    color: #f6f6f6;
-    background-color: #2f2f2f;
-  }
-
-  a:hover {
-    color: #24c8db;
-  }
-
-  input,
-  button {
-    color: #ffffff;
-    background-color: #0f0f0f98;
-  }
-  button:active {
-    background-color: #0f0f0f69;
-  }
+  :root { color: #f6f6f6; background-color: #2f2f2f; }
+  input, button, select { color: #fff; background-color: #0f0f0f98; border-color: #555; }
 }
-
 </style>
