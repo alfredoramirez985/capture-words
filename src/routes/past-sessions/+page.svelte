@@ -77,17 +77,12 @@
 </main>
 
 <style>
-:root {
-  font-family: Inter, Avenir, sans-serif;
-  color: #0f0f0f;
-  background-color: #f6f6f6;
-}
 .container {
   margin: 0;
   padding-top: 5vh;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  align-items: center;
   text-align: center;
   min-height: 100vh;
 }
@@ -96,28 +91,14 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  margin: 0 20px 40px 20px;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto 40px auto;
 }
-button {
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-family: inherit;
-  transition: all 0.25s;
-  outline: none;
-}
-button { cursor: pointer; box-shadow: 0 2px 2px rgba(0,0,0,0.1); background-color: #fff; }
-button:hover { border-color: #396cd8; }
-button:active { background-color: #eee; }
-.back-btn { background-color: transparent; box-shadow: none; border: 1px solid #ccc; }
-
 .session-list {
   list-style-type: none;
   padding: 0;
+  width: 100%;
   max-width: 600px;
   margin: 0 auto 40px auto;
   text-align: left;
@@ -127,56 +108,25 @@ button:active { background-color: #eee; }
   justify-content: space-between;
   align-items: center;
   padding: 15px 20px;
-  margin-bottom: 10px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  border: 1px solid #eaeaea;
+  margin-bottom: 12px;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.session-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  border-color: #d0d0d0;
 }
 .session-name {
   display: flex;
   align-items: baseline;
-  gap: 10px;
+  gap: 12px;
   font-size: 1.1em;
 }
 .date-badge {
-  color: #888;
+  color: var(--purple-highlight);
   font-size: 0.75em;
-  background-color: #f0f0f0;
+  background-color: rgba(199, 125, 255, 0.1);
   padding: 2px 6px;
   border-radius: 4px;
 }
 .session-desc {
   margin: 5px 0 0 0;
   font-size: 0.9em;
-  color: #666;
-}
-.star-btn {
-  background: none;
-  border: none;
-  box-shadow: none;
-  padding: 5px;
-  border-radius: 50%;
-}
-.star-btn:hover {
-  background-color: rgba(0,0,0,0.05);
-  border-color: transparent;
-}
-@media (prefers-color-scheme: dark) {
-  :root { color: #f6f6f6; background-color: #2f2f2f; }
-  .navbar { background-color: #3f3f3f; border-color: #555; }
-  button { color: #fff; background-color: #0f0f0f98; border-color: #555; }
-  .session-card { background-color: #3f3f3f; border-color: #555; }
-  .session-card:hover { border-color: #777; }
-  .date-badge { background-color: #555; color: #ccc; }
-  .session-desc { color: #aaa; }
-  .star-btn:hover { background-color: rgba(255,255,255,0.1); }
+  color: rgba(255, 255, 255, 0.6);
 }
 </style>

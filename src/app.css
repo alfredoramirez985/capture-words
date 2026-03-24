@@ -1,0 +1,157 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  --purple-bg: #0b0512;
+  --purple-panel: rgba(26, 12, 40, 0.6);
+  --purple-border: rgba(157, 78, 221, 0.3);
+  --purple-primary: #9d4edd;
+  --purple-highlight: #c77dff;
+  --purple-glow: rgba(157, 78, 221, 0.5);
+  
+  --text-main: #f0e6fc;
+  --text-muted: #a58fbd;
+  --text-bright: #ffffff;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  color: var(--text-main);
+  background-color: var(--purple-bg);
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(157, 78, 221, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 85% 10%, rgba(199, 125, 255, 0.1) 0%, transparent 40%);
+  margin: 0;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+h1, h2, h3 {
+  font-family: 'Outfit', sans-serif;
+  color: var(--text-bright);
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+input, select {
+  border-radius: 12px;
+  border: 1px solid var(--purple-border);
+  padding: 0.8em 1.2em;
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--text-bright);
+  background-color: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c77dff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1em;
+  padding-right: 2.5rem;
+}
+
+input::placeholder {
+  color: var(--text-muted);
+}
+
+input:focus, select:focus {
+  border-color: var(--purple-highlight);
+  background-color: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 3px rgba(157, 78, 221, 0.2);
+}
+
+select option {
+  background-color: var(--purple-bg);
+  color: var(--text-bright);
+}
+
+button {
+  border-radius: 12px;
+  border: 1px solid transparent;
+  padding: 0.8em 1.8em;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: 'Outfit', sans-serif;
+  color: #fff;
+  background: linear-gradient(135deg, var(--purple-primary) 0%, #7b2cbf 100%);
+  cursor: pointer;
+  box-shadow: 0 4px 14px var(--purple-glow);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  outline: none;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(199, 125, 255, 0.5);
+  background: linear-gradient(135deg, #b062eb 0%, #8930d6 100%);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px var(--purple-glow);
+}
+
+.back-btn {
+  background: transparent !important;
+  border: 1px solid var(--purple-border) !important;
+  color: var(--text-muted) !important;
+  box-shadow: none !important;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--text-bright) !important;
+  border-color: var(--text-muted) !important;
+  box-shadow: none !important;
+  transform: translateY(-1px) !important;
+}
+
+.session-card {
+  background: var(--purple-panel);
+  border: 1px solid var(--purple-border);
+  border-radius: 16px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.session-card:hover {
+  border-color: var(--purple-highlight);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(157, 78, 221, 0.15);
+}
+
+.navbar {
+  background: rgba(11, 5, 18, 0.6) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--purple-border);
+  box-shadow: none !important;
+}
+
+.star-btn {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 8px;
+  border-radius: 50%;
+}
+.star-btn:hover {
+  background: rgba(199, 125, 255, 0.1) !important;
+  transform: scale(1.1) !important;
+  box-shadow: none !important;
+}
+
+hr {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--purple-border), transparent);
+  margin: 40px 0;
+}
